@@ -1,0 +1,107 @@
+// theF.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#define vi std::vector<int>
+#define ii std::pair<int,int>
+#define INF (1e9 + 5)
+#define no std::cout << "No" << '\n'
+#define yes std::cout << "Yes" << '\n'
+#define fastio std::ios_base::sync_with_stdio(0); std::cin.tie(0);
+#define UNVISITED (-1)
+#define VISITED 1
+#define EXPLORED 2
+#define vii std::vector<ii>
+
+const int MOD = 998244353;
+using namespace __gnu_pbds;
+typedef tree<int, null_type, std::less<int>, rb_tree_tag,
+             tree_order_statistics_node_update>
+    oset;
+
+// Solution : run dijkstra form the destination after reversing every edge in the graph then we run a slightly modified dijkstra from the source.
+// Our modified dijkstra works as follows : we dont actually look for a relaxation process, instead we just check if the distance from the destination to the current node + the distance from
+// the source to our node is less than or equal the given p;
+
+int main() {
+	fastio;
+	int tt; tt = 1; std::cin >> tt;
+
+	while (tt--) {
+        int n,m,s,t,p; std::cin >> n >> m >> s >> t >> p;
+
+		std::vector<std::vector<ii>> adj(n + 1), tadj(n + 1);
+
+		for (int i = 0; i < m; i++) {
+			int u,v,w; std::cin >> u >> v >> w;
+			adj[u].push_back({v,w});
+			tadj[v].push_back({u,w});
+		}
+
+		std::priority_queue<ii, std::vector<ii>, std::greater<ii>> pq;
+		vi dist(n + 1, INF);
+
+		pq.push({0,t}); dist[t] = 0;
+
+		while (!pq.empty()) {
+			auto [d,u] = pq.top(); pq.pop();
+			if (d > dist[u]) continue;
+
+			for (auto [v,w] : tadj[u]) {
+				if (dist[u] + w >= dist[v]) continue;
+				dist[v] = dist[u] + w;
+				pq.push({dist[v],v});
+			}
+		}
+
+		vi dist2(n + 1, INF);
+		vii parent(n + 1);
+
+		pq.push({0,s}); dist2[s] = 0;
+		int ans = 0;
+
+		while (!pq.empty()) {
+			auto [d,u] = pq.top(); pq.pop();
+			if (d + dist[u] > p) continue;
+
+			for (auto [v,w] : adj[u]) {
+				if (dist2[u] + w + dist[v] > p) continue;
+				ans = std::max(ans,w);
+				dist2[v] = dist2[u] + w;
+				pq.push({dist2[v],v});
+			}
+		}
+
+		if (dist2[t] == INF) {
+			printf("-1\n");
+		}else {
+			printf("%d\n",ans);
+		}
+	}
+}
+
+/*
+2
+5 6 1 5 10
+1 2 7
+2 5 4
+1 3 6
+3 5 3
+1 4 5
+4 5 4
+2 1 1 2 10
+1 2 20
+ */
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started:
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
