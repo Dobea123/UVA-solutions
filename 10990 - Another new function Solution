@@ -1,0 +1,99 @@
+// Solution : first, in order to speed up the solution, you need to factorize every element from 2 to 2e6, which can be efficiently done by a modified sieve, then every depthPhi from 2 to 2e6 can be computed 
+// using DP where the recurrence is 1 + depthPhi(eulerPhi(n)), the base case is depthPhi[2] = 1, and finally we used prefix sum to sum all depthPhi values from 2 to 2e6.
+// each test case can be answered easily using static sum in range ... sum[n] - sum[m - 1] in O(1)
+// Complexity is O(2e6*log(log(2e6))) in preprocessing and O(1) for each test case
+
+// theF.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
+#include <bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+#define vi std::vector<int>
+#define ii std::pair<int,int>
+#define INF (1e9 + 5)
+#define no std::cout << "NO" << '\n'
+#define yes std::cout << "YES" << '\n'
+#define fastio std::ios_base::sync_with_stdio(0); std::cin.tie(0);
+#define UNVISITED (-1)
+#define VISITED 1
+#define EXPLORED 2
+#define vii std::vector<ii>
+#define LSOne(S) ((S) &-(S))
+
+const int MOD = 998244353;
+// using namespace __gnu_pbds;
+// typedef tree<int, null_type, std::less<int>, rb_tree_tag,
+//              tree_order_statistics_node_update>
+//     oset;
+
+vi depthP(2e6 + 1, -1);
+std::vector<std::set<int>> factorSieve(2e6 + 1);
+std::bitset<2000009> prime;
+
+int eulerPhi(int n) {
+    int ans = n;
+    for (auto j : factorSieve[n]) {
+        ans -= ans/j;
+    }
+    return ans;
+}
+
+int depthphi(int n) {
+    if (depthP[n] == -1) {
+        depthP[n] = 1 + depthphi(eulerPhi(n));
+    }
+    return depthP[n];
+}
+
+void sieve() {
+    prime.set();
+    prime[0] = prime[1] = false;
+
+    for(int i = 2; i <= 2e6; i++) {
+        if (prime[i]) {
+            for (int j = i + i; j <= 2e6; j += i) {
+                prime[j] = false;
+                factorSieve[j].insert(i);
+            }
+            factorSieve[i].insert(i);
+        }
+    }
+}
+
+int main() {
+    sieve();
+    depthP[2] = 1;
+    for (int i = 3; i <= 2e6; i++) {
+        depthphi(i);
+    }
+    std::vector<long long> sum(2e6 + 1, 0);
+    for (int i = 2; i <= 2e6; i++) {
+        sum[i] = sum[i - 1] + depthP[i];
+    }
+    int tt; scanf("%d",&tt);
+    while (tt--) {
+        int n,m; scanf("%d %d",&m,&n);
+        printf("%lld\n",sum[n] - sum[m - 1]);
+    }
+}
+
+
+
+
+/*
+2
+2 10
+100000 200000
+ */
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started:
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
