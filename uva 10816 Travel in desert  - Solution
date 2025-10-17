@@ -1,0 +1,123 @@
+// theF.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Solution : Binary search the temperature and then run dijkstra, skip any edge that where it's temperature > mid, save the answer and update the mid
+
+#include <bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+#define vi std::vector<int>
+#define ii std::pair<int,int>
+#define INF (1e9 + 5)
+#define no std::cout << "NO" << '\n'
+#define yes std::cout << "YES" << '\n'
+#define fastio std::ios_base::sync_with_stdio(0); std::cin.tie(0);
+#define UNVISITED (-1)
+#define VISITED 1
+#define EXPLORED 2
+#define vii std::vector<ii>
+#define LSOne(S) ((S) &-(S))
+
+const int MOD = 1e9 + 7;
+//const int MOD = 998244353;
+// using namespace __gnu_pbds;
+// typedef tree<int, null_type, std::less<int>, rb_tree_tag,
+//              tree_order_statistics_node_update>
+//     oset;
+
+void path(int t, vi&parent) {
+    if (parent[t] == -1) {
+        printf("%d", t);
+        return;
+    }
+    path(parent[t], parent);
+    printf(" %d", t);
+}
+
+int main() {
+    int N,E;
+    while (scanf("%d %d",&N,&E) == 2) {
+        int s,t; scanf("%d %d",&s,&t);
+        std::vector<std::vector<std::pair<int, std::pair<double,double>>>> AL(N + 1);
+        double low = INF, high = -INF;
+
+        for (int i = 0; i < E; i++) {
+            int x,y; double d,k; scanf("%d %d %lf %lf",&x,&y,&k,&d);
+            low = std::min(low, k);
+            high = std::max(high, k);
+
+            AL[x].push_back({y,{d,k}});
+            AL[y].push_back({x,{d,k}});
+        }
+
+        std::priority_queue<std::pair<double, std::pair<int,double>>, std::vector<std::pair<double, std::pair<int, double>>>, std::greater<std::pair<double, std::pair<int,double>>>> pq;
+
+
+        double anstemp = high, ansdist = INF;
+        vi ansrt(N + 1, -1);
+
+        for (int i = 0; i <= 60; ++i) {
+            vi parent(N + 1, UNVISITED);
+            std::vector<double> dist(N + 1, INF); dist[s] = 0;
+            double mid = (low + high) / 2;
+            pq.push({0, {s,0}});
+
+            while (!pq.empty()) {
+                auto p = pq.top(); pq.pop();
+                if (p.second.second > mid) continue;
+                if (p.first > dist[p.second.first]) continue;
+
+                for (auto v : AL[p.second.first]) {
+                    if (dist[p.second.first] + v.second.first >= dist[v.first]) continue;
+                    if (v.second.second > mid) continue;
+                    dist[v.first] = dist[p.second.first] + v.second.first;
+                    parent[v.first] = p.second.first;
+                    pq.push({dist[v.first], {v.first, v.second.second}});
+                }
+            }
+
+            if (mid <= anstemp && dist[t] != INF) {
+                if (anstemp == mid && dist[t] > ansdist) {
+                    low = mid;
+                }else {
+                    ansrt = parent;
+                    ansdist = dist[t];
+                    anstemp = mid;
+                    high = mid;
+                }
+            }else {
+                low = mid;
+            }
+        }
+
+        path(t, ansrt);
+        printf("\n");
+        printf("%.1lf %.1lf\n", ansdist, anstemp);
+    }
+}
+
+
+
+
+/*
+6 9
+1 6
+1 2 37.1 10.2
+2 3 40.5 20.7
+3 4 42.8 19.0
+3 1 38.3 15.8
+4 5 39.7 11.1
+6 3 36.0 22.5
+5 6 43.9 10.2
+2 6 44.2 15.2
+4 6 34.2 17.4
+*/
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started:
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln fi
