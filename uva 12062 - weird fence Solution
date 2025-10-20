@@ -1,0 +1,133 @@
+// theF.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Solution : Binary search the fence size, then for each fence size k, remove any edge from the Adjacency list whose length is greater than the ceil of the Euclidean distance between any blue and red pole
+
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#define vi std::vector<int>
+#define ii std::pair<int,int>
+#define INF (1e9 + 5)
+#define no std::cout << "NO" << '\n'
+#define yes std::cout << "YES" << '\n'
+#define fastio std::ios_base::sync_with_stdio(0); std::cin.tie(0);
+#define UNVISITED (-1)
+#define VISITED 1
+#define EXPLORED 2
+#define vii std::vector<ii>
+#define LSOne(S) ((S) &-(S))
+
+const int MOD = 1e9 + 7;
+
+using namespace __gnu_pbds;
+typedef tree<std::pair<int,int>, null_type, std::less<std::pair<int,int>>, rb_tree_tag,
+              tree_order_statistics_node_update>
+     oset;
+
+vi visited, match;
+std::vector<std::vector<int>> adj;
+
+int Aug(int i) {
+    if (visited[i] == VISITED) return 0;
+    visited[i] = VISITED;
+
+    for (auto j : adj[i]) {
+        if (match[j] == -1 or Aug(match[j])) {
+            match[j] = i;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int main() {
+    // freopen("dull.in", "r", stdin);
+    int T; scanf("%d", &T);
+    while (T--) {
+        int P, K; scanf("%d %d", &P, &K);
+        vii pos_red, pos_blue;
+        std::vector<std::string> svec;
+
+        for (int i = 0; i < P; ++i) {
+            std::string str;
+            int x,y; scanf("%d %d", &x, &y);
+            std::cin >> str; svec.push_back(str);
+            if (str == "red") {
+                pos_red.push_back({x,y});
+            }else {
+                pos_blue.push_back({x,y});
+            }
+        }
+
+        int low = 0, high = 100000, mid = (high + low) / 2;
+
+        int rans = -1;
+
+        while (low <= high) {
+            adj.assign(pos_blue.size(), std::vector<int>());
+            mid = (low + high) / 2;
+            for (int i = 0; i < pos_blue.size(); ++i) {
+                for (int j = 0; j < pos_red.size(); ++j) {
+                    int first = std::pow(pos_blue[i].first - pos_red[j].first, 2);
+                    int second = std::pow(pos_blue[i].second - pos_red[j].second, 2);
+                    int check = std::ceil(sqrt(first + second));
+                    if (check <= mid) {
+                        adj[i].push_back(j);
+                    }
+                }
+            }
+
+            int ans = 0;
+            match.assign(pos_red.size(), -1);
+
+            for (int i = 0; i < pos_blue.size(); ++i) {
+                visited.assign(pos_blue.size(), UNVISITED);
+                ans += Aug(i);
+            }
+
+            if (ans >= K) {
+                rans = mid;
+                high = mid - 1;
+            }else {
+                low = mid + 1;
+            }
+        }
+
+        if (rans == -1) {
+            printf("Impossible\n");
+        }else {
+            printf("%d\n", rans);
+        }
+    }
+}
+
+
+
+
+/*
+2
+6 2
+-3 5 blue
+-3 3 red
+1 5 blue
+2 0 red
+4 6 blue
+4-1 red
+6 4
+-3 5 blue
+-3 3 red
+1 5 blue
+2 0 red
+4 6 blue
+4-1 red
+*/
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started:
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln fi
