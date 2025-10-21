@@ -1,0 +1,87 @@
+// theF.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Solution : Binary search the maximum distance and assign the access points greedily
+
+#include <bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+#define vi std::vector<int>
+#define ii std::pair<int,int>
+#define INF (1e9 + 5)
+#define no std::cout << "NO" << '\n'
+#define yes std::cout << "YES" << '\n'
+#define fastio std::ios_base::sync_with_stdio(0); std::cin.tie(0);
+#define UNVISITED (-1)
+#define VISITED 1
+#define EXPLORED 2
+#define vii std::vector<ii>
+#define LSOne(S) ((S) &-(S))
+
+const int MOD = 1e9 + 7;
+
+// using namespace __gnu_pbds;
+// typedef tree<std::pair<int,int>, null_type, std::less<std::pair<int,int>>, rb_tree_tag,
+//               tree_order_statistics_node_update>
+//      oset;
+
+int main() {
+    int T; scanf("%d", &T);
+    while (T--) {
+        int N,M; scanf("%d %d",&N,&M);
+        std::vector<double> places(M); for (auto&j : places) scanf("%lf",&j);
+
+        double low = 0, high = 1e6 + 1;
+        double mid = (low + high) / 2;
+        double ans = INF;
+        int test = 0;
+        sort(places.begin(), places.end());
+
+        for (int j = 0; j < 60; ++j) {
+            mid = (low + high) / 2;
+
+            int num = 0;
+            double max = 0;
+            int n = N;
+
+            for (int i = 0; i < M; i++) {
+                if (places[i] > max) {
+                    if (n == 0) break;
+                    max = places[i] + 2*mid;
+                    --n;
+                }
+                ++num;
+            }
+
+            ++test;
+            if (num == M) {
+                ans = mid;
+                high = mid;
+            }else {
+                low = mid;
+            }
+        }
+
+        printf("%0.1lf\n", ans);
+    }
+}
+
+
+
+
+/*
+2
+2 3
+1 3 10
+1 5
+1 2 3 4 5
+*/
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started:
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln fi
