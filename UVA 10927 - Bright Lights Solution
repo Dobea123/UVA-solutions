@@ -1,0 +1,113 @@
+// theF.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Solution : sort the points by Euclidean distance from the origin, and for each slope, iterate through the Euclidean distances and record the prefix max pole, for every pole thats farther than the previous
+// one and has shorter or equal distance then by definition it's invisible. 
+
+#include <bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+#define vi std::vector<int>
+#define ii std::pair<int,int>
+#define INF (1e9 + 5)
+#define no std::cout << "NO" << '\n'
+#define yes std::cout << "YES" << '\n'
+#define fastio std::ios_base::sync_with_stdio(0); std::cin.tie(0);
+#define UNVISITED (-1)
+#define VISITED 1
+#define EXPLORED 2
+#define vii std::vector<ii>
+#define LSOne(S) ((S) &-(S))
+
+const int MOD = 1e9 + 7;
+
+// using namespace __gnu_pbds;
+// typedef tree<std::pair<int,int>, null_type, std::less<std::pair<int,int>>, rb_tree_tag,
+//               tree_order_statistics_node_update>
+//      oset;
+
+
+int main() {
+    int N, casen = 0;
+    while(scanf("%d", &N) == 1 && N != 0) {
+        std::vector<std::pair<ii, int>> points(N);
+
+        for (int i = 0; i < N; i++) {
+            int x,y,z; scanf("%d %d %d", &x,&y,&z);
+            points[i].first.first = x; points[i].first.second = y;
+            points[i].second = z;
+        }
+
+        vii invisible;
+        std::map<double,int> slope_height;
+
+        std::vector<std::pair<double, std::pair<std::pair<int,int>, int>>> distance_height(N);
+        for (int i = 0; i < N; i++) {
+            double dist = sqrt(std::pow(points[i].first.second, 2) + std::pow(points[i].first.first, 2));
+            distance_height[i].first = dist;
+            distance_height[i].second.second = points[i].second;
+            distance_height[i].second.first.first = points[i].first.first;
+            distance_height[i].second.first.second = points[i].first.second;
+        }
+
+        sort(distance_height.begin(), distance_height.end());
+
+        for (int i = 0; i < N; i++) {
+            double slope = INF * 2 ;
+            if (distance_height[i].second.first.first != 0) {
+                slope = (double)distance_height[i].second.first.second / distance_height[i].second.first.first;
+            }
+            if (distance_height[i].second.first.second == 0) {
+                if (distance_height[i].second.first.first > 0) {
+                    slope = INF;
+                }else {
+                    slope = -INF;
+                }
+            }
+            if (slope_height.find(slope) == slope_height.end()) slope_height[slope] = -1;
+            if (slope_height[slope] >= distance_height[i].second.second) {
+                invisible.push_back({distance_height[i].second.first.first, distance_height[i].second.first.second});
+            }else {
+                slope_height[slope] = distance_height[i].second.second;
+            }
+        }
+
+        printf("Data set %d:\n", ++casen);
+        if (invisible.empty()) {
+            printf("All the lights are visible.\n");
+        }else {
+            sort(invisible.begin(), invisible.end());
+            printf("Some lights are not visible:\n");
+            for (int i = 0; i < invisible.size() - 1; i++) {
+                printf("x = %d, y = %d;\n", invisible[i].first, invisible[i].second);
+            }
+            printf("x = %d, y = %d.\n", invisible[invisible.size() - 1].first, invisible[invisible.size() - 1].second);
+        }
+    }
+}
+
+
+
+
+/*
+3
+-1 0 1
+0 1 1
+1 0 1
+5
+-1 0 1
+-1 1 2
+-2 2 2
+-3 3 3
+-4 4 2
+0
+*/
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started:
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln fi
