@@ -1,0 +1,82 @@
+// theF.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Solution : straightforward simulation
+
+#include <bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+#define vi std::vector<int>
+#define ii std::pair<int,int>
+#define INF (1e9 + 5)
+#define no std::cout << "NO" << '\n'
+#define yes std::cout << "YES" << '\n'
+#define fastio std::ios_base::sync_with_stdio(0); std::cin.tie(0);
+#define UNVISITED (-1)
+#define VISITED 1
+#define EXPLORED 2
+#define vii std::vector<ii>
+#define LSOne(S) ((S) &-(S))
+
+const int MOD = 1e9 + 7;
+
+// using namespace __gnu_pbds;
+// typedef tree<std::pair<int,int>, null_type, std::less<std::pair<int,int>>, rb_tree_tag,
+//               tree_order_statistics_node_update>
+//      oset;
+
+
+int main() {
+    int N;
+    while(scanf("%d", &N) == 1 && N != 0) {
+        vii points(N);
+        int center = N / 2;
+        int x0, y0 = x0 = 0;
+        for(int i = 0; i < N; i++) {
+            scanf("%d %d",&points[i].first, &points[i].second);
+            if (i == center) {
+                x0 = points[i].first;
+                y0 = points[i].second;
+            }
+        }
+
+        int first, second = first = 0;
+        for (int i = 0; i < N; i++) {
+            if ((points[i].first > x0 && points[i].second > y0) or (points[i].first < x0 && points[i].second < y0)) {
+                ++first;
+            }else if ((points[i].first < x0 && points[i].second > y0) or (points[i].first > x0 && points[i].second < y0)) {
+                ++second;
+            }
+        }
+
+        printf("%d %d\n",first, second);
+    }
+}
+
+
+
+
+/*
+11
+3 2
+3 3
+3 4
+3 6
+2 -2
+1 -3
+0 0
+-3-3
+-3-2
+-3-4
+3-7
+0
+*/
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started:
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln fi
