@@ -1,0 +1,140 @@
+// theF.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Solution : distance to line segment between every 2 consecutive polygon points, the radius is the minimum distance
+
+#include <bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+#define vi std::vector<int>
+#define ii std::pair<int,int>
+#define INF (1e9 + 5)
+#define no std::cout << "NO" << '\n'
+#define yes std::cout << "YES" << '\n'
+#define fastio std::ios_base::sync_with_stdio(0); std::cin.tie(0);
+#define UNVISITED (-1)
+#define VISITED 1
+#define EXPLORED 2
+#define vii std::vector<ii>
+#define LSOne(S) ((S) &-(S))
+
+const int MOD = 1e9 + 7;
+
+// using namespace __gnu_pbds;
+// typedef tree<std::pair<int,int>, null_type, std::less<std::pair<int,int>>, rb_tree_tag,
+//               tree_order_statistics_node_update>
+//      oset;
+
+struct point {
+    double x, y;
+    point() : x(0), y(0) {}
+    point(double _x, double _y) : x(_x), y(_y) {}
+};
+
+struct vec {
+    double x,y;
+    vec(double _x, double _y) : x(_x), y(_y) {}
+};
+
+vec toVec(point a, point b) {
+    return {b.x - a.x, b.y - a.y};
+}
+
+double dot(vec a, vec b) {
+    return a.x * b.x + a.y * b.y;
+}
+
+double norm_sq(vec a) {
+    return a.x * a.x + a.y * a.y;
+}
+
+double dist(point a, point b) {
+    return hypot(a.x - b.x, a.y - b.y);
+}
+
+point translate(point a, vec ab) {
+    return {a.x + ab.x, a.y + ab.y};
+}
+
+vec scale(vec a, double u) {
+    return {a.x * u , a.y * u};
+}
+
+double distToLine(point p, point a, point b) {
+    vec ab(toVec(a, b)), ap(toVec(a, p));
+    double u = dot(ab, ap) / norm_sq(ab);
+
+    point c = translate(a, scale(ab,u));
+    return dist(p,c);
+}
+
+double distanceToLineSegment(point p, point a, point b) {
+    vec ab(toVec(a, b)), ap(toVec(a, p));
+    double u = dot(ab, ap) / norm_sq(ab);
+    if (u < 0.0) {
+        return dist(a,p);
+    }else if (u > 1.0) {
+        return dist(b,p);
+    }
+    return distToLine(p, a, b);
+}
+
+int main() {
+    int N;
+    while (scanf("%d", &N) == 1 && N <= 16) {
+
+        int xcenter, ycenter; scanf("%d %d", &xcenter, &ycenter);
+        point center(xcenter, ycenter);
+        std::vector<point> points(N);
+        double ans = 1e18;
+
+        for (int i = 0; i < N; i++) {
+            double x,y; scanf("%lf %lf\n", &x, &y);
+            point curr(x,y);
+            points[i] = curr;
+        }
+
+        for (int i = 0; i < N; i++) {
+            int j = (i + 1) % N;
+            ans = std::min(ans, distanceToLineSegment(center, points[i], points[j]));
+        }
+
+        printf("%0.3lf\n", ans);
+    }
+}
+
+
+
+
+/*
+12
+2 2
+0 1
+1 1
+2 0
+3 0
+3 1
+4 2
+3 3
+3 4
+2 4
+1 3
+0 3
+1 2
+4
+2 2
+0 2
+2 0
+4 2
+2 4
+*
+*/
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started:
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln fi
