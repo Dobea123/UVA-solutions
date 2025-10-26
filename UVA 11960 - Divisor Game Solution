@@ -1,0 +1,82 @@
+// theF.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Solution : simple prefix max, precalculate the largest divisor from 1 to 1e6 and for each iteration takee the maximum number of divisors between the current element or the previous one, note if they are equal
+// then take the larger.
+
+#include <bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+#define vi std::vector<int>
+#define ii std::pair<int,int>
+#define INF (1e9 + 5)
+#define no std::cout << "NO" << '\n'
+#define yes std::cout << "YES" << '\n'
+#define fastio std::ios_base::sync_with_stdio(0); std::cin.tie(0);
+#define UNVISITED (-1)
+#define VISITED 1
+#define EXPLORED 2
+#define vii std::vector<ii>
+#define LSOne(S) ((S) &-(S))
+
+const int MOD = 1e9 + 7;
+
+// using namespace __gnu_pbds;
+// typedef tree<std::pair<int,int>, null_type, std::less<std::pair<int,int>>, rb_tree_tag,
+//               tree_order_statistics_node_update>
+//      oset;
+
+vii prefixMax(1e6 + 1);
+
+void initialize() {
+    prefixMax[0] = {1,1};
+    for (int i = 1; i <= 1e6; i++) {
+        int numOfDivisors = 1;
+        int cpy = i;
+        for (int j = 2; j * j <= cpy; ++j) {
+            int cnt = 0;
+            while (cpy % j == 0) {
+                cpy /= j;
+                ++cnt;
+            }
+            numOfDivisors *= (cnt + 1);
+        }
+
+        if (cpy != 1) {
+            numOfDivisors *= 2;
+        }
+        if (prefixMax[i - 1].first <= numOfDivisors) {
+            prefixMax[i] = {numOfDivisors, i};
+        }else {
+            prefixMax[i] = prefixMax[i - 1];
+        }
+    }
+}
+
+int main() {
+    initialize();
+    int T; scanf("%d",&T);
+    while (T--) {
+        int N; scanf("%d",&N);
+        printf("%d\n", prefixMax[N].second);
+    }
+}
+
+
+
+
+/*
+3
+1
+10
+37
+*/
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started:
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln fi
