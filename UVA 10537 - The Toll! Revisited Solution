@@ -1,0 +1,132 @@
+// theF.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Solution : dijkstra + binary search on numebr of starting items, two main tricks here : first is handling the dynamic cost relating to whether we are visiting a town or a village which is fairly easy,
+// the second trick is actually a bit ugly to deal with, first get the optimal answer and then reconstruct the best path; 
+ 
+#include <bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+#define vi std::vector<int>
+#define ii std::pair<int,int>
+#define INF (1e9 + 5)
+#define no std::cout << "NO" << '\n'
+#define yes std::cout << "YES" << '\n'
+#define fastio std::ios_base::sync_with_stdio(0); std::cin.tie(0);
+#define UNVISITED (-1)
+#define VISITED 1
+#define EXPLORED 2
+#define vii std::vector<ii>
+#define LSOne(S) ((S) &-(S))
+const int MOD = 1e9 + 7;
+ 
+// using namespace __gnu_pbds;
+// typedef tree<std::pair<int,int>, null_type, std::less<std::pair<int,int>>, rb_tree_tag,
+//               tree_order_statistics_node_update>
+//      oset;
+std::vector<char> pans;
+int p; char start,end;
+
+void dijkstra(std::map<char, std::vector<char>> &AL, std::vector<char> path, long long cost, char start, int p, std::map<char, int> visited) {
+    if (cost < p) return;
+    if (start == end) {
+        path.push_back(start);
+        if (pans.empty() or path < pans) {
+            pans = path;
+        }
+        return;
+    }
+
+    if (visited[start] == VISITED) return;
+    visited[start] = VISITED;
+    path.push_back(start);
+
+    for (auto v : AL[start]) {
+        bool rem = cost % 20;
+        long long ncost = v < 'a' ? rem + cost / 20 : 1;
+        dijkstra(AL, path, cost - ncost, v, p, visited);
+    }
+}
+
+int main() {
+    int N;
+    int casen = 0;
+    while(std::cin >> N && N != -1) {
+        pans.clear();
+        std::map<char,std::vector<char>> AL;
+
+        for (int i = 0; i < N; i++) {
+            char first, second; std::cin >> first >> second;
+            AL[first].push_back(second);
+            AL[second].push_back(first);
+        }
+
+        std::cin >> p >> start >> end;
+        long long low, high, ans = high = low = 1e18;
+        low = 0;
+        if (start == end) {
+            printf("Case %d:\n%d\n%c\n",++casen, p, end);
+            continue;
+        }
+        for (int i = 0; i < 60; ++i) {
+            if (low > high) break;
+            long long mid = (low + high) / 2;
+
+            std::priority_queue<std::pair<long long, char>> pq; pq.push({mid, start});
+            std::map<char,long long> dist;
+
+            while (!pq.empty()) {
+                auto [d, u] = pq.top(); pq.pop();
+                if (dist[u] > d) continue;
+
+                for (auto v : AL[u]) {
+                    bool rem = d % 20;
+                    long long cost = (v < 'a' ? rem + d / 20 : 1);
+                    if (d - cost < dist[v]) continue;
+                    dist[v] = d - cost;
+                    pq.push({dist[v], v});
+                }
+            }
+
+            if (ans > mid && dist[end] >= p) {
+                ans = mid;
+                high = mid - 1;
+            }else {
+                low = mid + 1;
+            }
+        }
+        std::vector<char> path; std::map<char,int> visited;
+        dijkstra(AL, path, ans, start, p, visited);
+
+        printf("Case %d:\n%lld\n",++casen, ans);
+        for (int i = 0; i < pans.size() - 1; i++) {
+            printf("%c-", pans[i]);
+        }printf("%c\n", end);
+    }
+}
+ 
+ 
+ 
+ 
+/*
+1
+a Z
+19 a Z
+5
+A D
+D X
+A b
+b c
+c X
+39 A X
+-1
+*/
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+ 
+// Tips for Getting Started:
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln fi
