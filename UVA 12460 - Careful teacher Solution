@@ -1,0 +1,119 @@
+// theF.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Solution : for every word in the dictionary, iterate through all unchecked pairs and check if they are different in less than or equal one letter, if yes add them to the same set using a DSU.
+// for every query : just check if both strings are on the same set
+
+#include <bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+#define vi std::vector<int>
+#define ii std::pair<int,int>
+#define INF (1e9 + 5)
+#define no std::cout << "NO" << '\n'
+#define yes std::cout << "YES" << '\n'
+#define fastio std::ios_base::sync_with_stdio(0); std::cin.tie(0);
+#define UNVISITED (-1)
+#define VISITED 1
+#define EXPLORED 2
+#define vii std::vector<ii>
+#define LSOne(S) ((S) &-(S))
+const int MOD = 1e9 + 7;
+
+// using namespace __gnu_pbds;
+// typedef tree<std::pair<int,int>, null_type, std::less<std::pair<int,int>>, rb_tree_tag,
+//               tree_order_statistics_node_update>
+//      oset;
+
+class UnionFind {
+private:
+    vi p, rank, setSize;
+    int numSets;
+public:
+    UnionFind(int N) {
+        p.assign(N, 0); for (int i = 0; i < N; ++i) p[i] = i;
+        rank.assign(N, 0);
+        setSize.assign(N, 1);
+        numSets = N;
+    }
+
+    int findSet(int i) { return (p[i] == i) ? i : (p[i] = findSet(p[i])); }
+    bool isSameSet(int i, int j) { return findSet(i) == findSet(j); }
+
+    int numDisjointSets() { return numSets; }
+    int sizeOfSet(int i) { return setSize[findSet(i)]; }
+
+    void unionSet(int i, int j) {
+        if (isSameSet(i, j)) return;
+        int x = findSet(i), y = findSet(j);
+        if (rank[x] > rank[y]) std::swap(x, y);
+        p[x] = y;
+        if (rank[x] == rank[y]) ++rank[y];
+        setSize[y] += setSize[x];
+        --numSets;
+    }
+};
+
+
+int main() {
+    std::string str;
+    std::vector<std::string> vec;
+    std::map<std::string, int> mp;
+
+    while (std::cin >> str && str != "--") {
+        vec.push_back(str);
+        mp[str] = vec.size() - 1;
+    }
+
+
+    UnionFind UF(vec.size() + 1);
+    for (int i = 0; i < vec.size(); ++i) {
+        for (int j = i + 1; j < vec.size(); ++j) {
+            int diff = 0;
+            if (vec[i].size() != vec[j].size()) continue;
+            for (int k = 0; k < vec[i].size(); ++k) {
+                if (vec[i][k] != vec[j][k]) ++diff;
+            }
+
+            if (diff <= 1) {
+                UF.unionSet(i, j);
+            }
+        }
+    }
+
+    std::string str1, str2;
+    while (std::cin >> str1 && std::cin >> str2) {
+        if (UF.isSameSet(mp[str1], mp[str2])) {
+            printf("Yes\n");
+        }else {
+            printf("No\n");
+        }
+    }
+}
+
+
+
+
+/*
+abc
+abd
+acc
+bbb
+aba
+--
+abc acc
+abc bbb
+acc abd
+bbb abc
+abd abc
+aba abc
+*/
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started:
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln fi
