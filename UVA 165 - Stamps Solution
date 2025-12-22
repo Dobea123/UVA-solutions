@@ -1,0 +1,116 @@
+// theF.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Solution: Pre-calculate every answer, for each pair {h,k} generate every subset of size k and then for each subset run a complete search with h chosen elements from each subset and compute the maximum
+// contiguos sum
+// note the solution can be optimized but this solution passes easily
+
+#include <bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+#define vi std::vector<int>
+#define ii std::pair<int,int>
+#define INF (1e9 + 5)
+#define no std::cout << "NO" << '\n'
+#define yes std::cout << "YES" << '\n'
+#define fastio std::ios_base::sync_with_stdio(0); std::cin.tie(0);
+#define UNVISITED (-1)
+#define VISITED 1
+#define EXPLORED 2
+#define vii std::vector<ii>
+#define LSOne(S) ((S) &-(S))
+// #pragma GCC optimize("Ofast")
+// #pragma GCC target("avx,avx2,fma")
+// #pragma GCC optimization("unroll-loops")
+
+const int MOD = 998244353;
+
+// using namespace __gnu_pbds;
+// typedef tree<int, null_type, int, rb_tree_tag,
+//               tree_order_statistics_node_update>
+//      oset;
+vi vec;
+std::vector<std::vector<int>> subs;
+vi sums;
+std::vector<std::vector<std::vector<int>>> ans;
+
+void gen(int k, int idx, vi subset) {
+    if (subset.size() == k) {
+        subs.push_back(subset);
+        return;
+    }
+    if (idx >= 32) return;
+
+    gen(k, idx + 1, subset);
+
+    subset.push_back(vec[idx]);
+    gen(k, idx + 1, subset);
+}
+
+void gen2(int h, vi &subset, int sum) {
+    if (sum >= 200) return;
+    sums[sum] = 1;
+    if (h == 0) return;
+
+    for (int i = 0; i < subset.size(); i++) {
+        gen2(h - 1, subset, sum + subset[i]);
+    }
+}
+
+int main() {
+    ans.assign(10, std::vector<std::vector<int>>(10));
+    for (int i = 1; i < 33; ++i) {
+        vec.push_back(i);
+    }
+
+    for (int i = 1; i <= 9; ++i) {
+        vi sub{1};
+        for (int j = 1; (j + i) <= 9; ++j) {
+            subs.clear();
+            gen(j, 0, sub);
+
+            for (auto sb : subs) {
+                sums.assign(200, 0);
+                gen2(i, sb, 0);
+                int mx = -1;
+
+                for (auto j : sums) {
+                    if (j == 0) break;
+                    ++mx;
+                }
+
+                if (ans[i][j].empty() or mx > ans[i][j].back()) {
+                    sb.push_back(mx);
+                    ans[i][j] = sb;
+                }
+            }
+        }
+    }
+
+    int h, k;
+    while (std::cin >> h >> k && h && k) {
+        for (int i = 0; i < ans[h][k].size() - 1; ++i) {
+            printf("%3d", ans[h][k][i]);
+        }printf(" ->%3d\n", ans[h][k].back());
+    }
+}
+
+
+
+/*
+7 4
+1010100
+1 5 1 0 0 1
+3 7 1 1 1 1
+3 4 0 1 0 0
+7 7 1 1 1 1
+*/
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started:
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln fi
